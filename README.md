@@ -34,6 +34,16 @@
 npx wrangler deploy
 ```
 
+## 分享預覽圖
+
+`public/og.png`（1200×630）由 `og/card.html` 產生，修改後用 Chrome 重新截圖：
+
+```sh
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars \
+  --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=10000 \
+  --screenshot="$PWD/public/og.png" "file://$PWD/og/card.html"
+```
+
 ## 按鍵資料來源
 
 五個音由低到高對應 Switch 2 預設配置的 L、R、A、Y、X。薩爾達的搖籃曲和時之歌的按法有任天堂官方截圖可以對照，這兩首用到全部五個音；其他歌照原版旋律換算。

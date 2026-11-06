@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>時之笛 譜架 預覽圖</title>
+<!-- Source for public/og.png (1200x630). Regenerate with headless Chrome, see README. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+TC:wght@500;700&family=Noto+Serif+TC:wght@900&display=block">
+<style>
+:root{--night:#0b141c;--stone:#131f29;--stone-2:#1a2834;--line:#2a3b49;--gold:#d9b55e;--gold-soft:#9c8143;--gold-hi:#f3d68c;--parch:#ece2c6;--parch-dim:#a8a28f}
+*{box-sizing:border-box}
+html,body{margin:0;width:1200px;height:630px;overflow:hidden}
+body{
+  position:relative;color:var(--parch);font-family:"Noto Sans TC","PingFang TC",sans-serif;
+  background:
+    radial-gradient(70% 95% at 80% 50%, #1e3547 0%, rgba(30,53,71,0) 62%),
+    radial-gradient(55% 70% at 0% 0%, #162836 0%, rgba(22,40,54,0) 60%),
+    #0b141c;
+}
+.frame{position:absolute;inset:24px;border:1px solid rgba(217,181,94,.32);border-radius:20px}
+.corner{position:absolute;width:26px;height:26px;border-color:var(--gold);border-style:solid}
+.c1{left:16px;top:16px;border-width:2px 0 0 2px;border-top-left-radius:12px}
+.c2{right:16px;top:16px;border-width:2px 2px 0 0;border-top-right-radius:12px}
+.c3{left:16px;bottom:16px;border-width:0 0 2px 2px;border-bottom-left-radius:12px}
+.c4{right:16px;bottom:16px;border-width:0 2px 2px 0;border-bottom-right-radius:12px}
+.left{position:absolute;left:84px;top:0;bottom:0;width:520px;display:flex;flex-direction:column;justify-content:center;gap:24px}
+.eyebrow{font-family:"Cinzel",serif;font-weight:700;letter-spacing:.3em;font-size:19px;color:var(--gold)}
+h1{margin:0;font-family:"Noto Serif TC",serif;font-weight:900;font-size:100px;line-height:1.02;letter-spacing:.03em;
+  background:linear-gradient(180deg,#f7e4a6 8%,#c4963b 92%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0;font-size:31px;line-height:1.5;font-weight:500}
+.sub b{color:var(--gold-hi);font-weight:700}
+.chips{display:flex;gap:12px}
+.chip{border:1.5px solid var(--gold-soft);border-radius:999px;padding:7px 18px;font-size:19px;white-space:nowrap}
+.foot{position:absolute;left:84px;bottom:52px;font-size:18px;color:var(--parch-dim);letter-spacing:.02em}
+.grid{position:absolute;right:78px;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(4,104px);gap:24px 22px}
+.mw{--s:86px;position:relative;width:104px;height:104px;display:grid;place-items:center}
+.ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.ring circle{fill:none}
+.ring-track{stroke:var(--gold-soft);stroke-width:2}
+.ring-prog{stroke:var(--gold-hi);stroke-width:4.6;stroke-linecap:round;stroke-dasharray:100}
+.medal{position:relative;width:var(--s);height:var(--s);border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%), var(--stone-2);
+  border:2px solid color-mix(in srgb, var(--c) 72%, transparent)}
+.halo{position:absolute;inset:-16px;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb, var(--c) 50%, transparent) 0%, transparent 66%)}
+.rip{position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);border-radius:50%;border:2px solid var(--c)}
+.ico{width:calc(var(--s) * .56);height:calc(var(--s) * .56);display:block;color:var(--c);overflow:visible}
+.ico .fl{fill:currentColor;fill-opacity:.25;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+.ico .st{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ico .thin2{stroke-width:1.4}
+.ico .thin{stroke-width:1}
+.ico .solid{fill:currentColor}
+.ico .hole{fill:var(--stone-2)}
+.a-sheen,.a-gemspark,.a-grains,.a-ember,.a-moonglow,.a-rays,.a-croak{opacity:0}
+.hot .a-ember{opacity:.95}
+</style>
+</head>
+<body>
+<div class="frame"><i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i></div>
+<div class="left">
+  <div class="eyebrow">OCARINA SONGBOOK</div>
+  <h1>時之笛<br>譜架</h1>
+  <p class="sub">點一下歌曲，手機吹出旋律<br>靠近 <b>Switch 2</b>，林克照著吹</p>
+  <div class="chips"><span class="chip">14 首陶笛曲</span><span class="chip">Switch 2 按鍵樂譜</span><span class="chip">免費・免安裝</span></div>
+</div>
+<div class="foot">ocarina-player.a84012807.workers.dev ・ 非官方玩家工具</div>
+<div class="grid" id="grid"></div>
+<script>
+const CROWN = 'M4.2 17.5 3 8l5 4 4-6 4 6 5-4-1.2 9.5z';
+const MOON = 'M15 3.6A8.6 8.6 0 1 0 20.6 17 7 7 0 0 1 15 3.6z';
+const ICONS = {
+  crown: `<defs><clipPath id="cc{u}"><path d="${CROWN}"/></clipPath></defs><path class="fl" d="${CROWN}"/><g clip-path="url(#cc{u})"><path class="a-sheen" fill="#fff" d="M1 19 4.5 4h2.6L3.6 19z"/></g><path class="st" d="M4.5 20.5h15"/><circle class="solid a-gem" cx="12" cy="13.6" r="1.4"/><path class="a-gemspark" fill="#fff" d="M12 11.2l.45 1.95 1.95.45-1.95.45-.45 1.95-.45-1.95-1.95-.45 1.95-.45z"/>`,
+  hourglass: `<g class="a-flip"><path class="st" d="M6.5 3.2h11M6.5 20.8h11"/><path class="st" d="M8 3.2c0 4.6 4 5.6 4 8.8s-4 4.2-4 8.8h8c0-4.6-4-5.6-4-8.8s4-4.2 4-8.8z"/><path class="solid a-sand-top" opacity=".6" d="M8.7 5.4h6.6c-.7 2.4-2.4 3.7-3.3 5.3-.9-1.6-2.6-2.9-3.3-5.3z"/><path class="solid a-sand-bot" d="M9 20.8c.6-2.6 3-3.7 3-3.7s2.4 1.1 3 3.7z"/><g class="a-grains"><circle class="solid a-grain" cx="12" cy="12.6" r=".55"/><circle class="solid a-grain g2" cx="12" cy="12.6" r=".55"/></g></g>`,
+  sun: `<g class="a-spin"><g class="a-breathe"><path class="st" d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></g></g><circle class="fl" cx="12" cy="12" r="4"/>`,
+  storm: `<g class="a-drift"><path class="fl" d="M7 15.5a4 4 0 0 1-.3-8 5.2 5.2 0 0 1 10 1.3 3.4 3.4 0 0 1 .3 6.7z"/></g><path class="st a-bolt" d="M12.6 13.2 10.4 17.4h3.2l-2 4"/>`,
+  horseshoe: `<g class="a-gallop"><path class="st" style="stroke-width:3.4;stroke-linecap:butt" d="M6.5 3.8v6.7a5.5 5.5 0 0 0 11 0V3.8"/><circle class="hole" cx="6.5" cy="6.6" r=".75"/><circle class="hole" cx="17.5" cy="6.6" r=".75"/><circle class="hole" cx="7.2" cy="12.6" r=".75"/><circle class="hole" cx="16.8" cy="12.6" r=".75"/></g>`,
+  fairy: `<g class="a-hover"><g class="a-wing-l"><ellipse class="fl" style="stroke-width:1.3" cx="7.4" cy="9" rx="4.2" ry="2.5" transform="rotate(28 7.4 9)"/><ellipse class="fl" style="stroke-width:1.3" cx="8.4" cy="15.4" rx="2.9" ry="1.7" transform="rotate(-24 8.4 15.4)"/></g><g class="a-wing-r"><ellipse class="fl" style="stroke-width:1.3" cx="16.6" cy="9" rx="4.2" ry="2.5" transform="rotate(-28 16.6 9)"/><ellipse class="fl" style="stroke-width:1.3" cx="15.6" cy="15.4" rx="2.9" ry="1.7" transform="rotate(24 15.6 15.4)"/></g><circle class="solid" cx="12" cy="12" r="2.7"/></g>`,
+  leaf: `<g class="a-sway"><path class="fl" d="M5 19C5 10.5 10.5 5 19 5c0 8.5-5.5 14-14 14z"/><path class="st thin2" d="M5 19 14.5 9.5M9.5 14.5h3.6M11.8 12.2V8.8"/></g>`,
+  flame: `<g class="a-flicker"><path class="fl" d="M12 2.8c.8 3.6 5.2 5.6 5.2 10.7a5.2 5.2 0 0 1-10.4 0c0-2.7 1.6-4 2.2-5.8.9.9 1.5 2 1.6 3.1 1.3-2.2 1.9-4.8 1.4-8z"/></g><g class="a-flicker2"><path class="solid" d="M12 20.4c-1.5 0-2.5-1-2.5-2.4 0-1.6 1.4-2.4 2.5-4.1 1.1 1.7 2.5 2.5 2.5 4.1 0 1.4-1 2.4-2.5 2.4z"/></g><circle class="solid a-ember" cx="9.4" cy="5.4" r=".8"/><circle class="solid a-ember e2" cx="14.8" cy="4.6" r=".65"/><circle class="solid a-ember e3" cx="12" cy="1.6" r=".7"/>`,
+  drop: `<g class="a-bob"><path class="fl" d="M12 3c3.2 4.6 6 7.8 6 11.5a6 6 0 0 1-12 0C6 10.8 8.8 7.6 12 3z"/><g class="a-wave"><path class="st thin2" d="M8.8 15.4c1.1-.9 2.1-.9 3.2 0s2.1.9 3.2 0"/></g></g>`,
+  moon: `<path class="solid a-moonglow" d="${MOON}"/><path class="fl" d="${MOON}"/><path class="solid a-twinkle" d="M18.2 5.2l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z"/><circle class="solid a-twinkle t2" cx="21" cy="11.4" r=".65"/>`,
+  dune: `<path class="fl" d="M2.5 19.8c2.4-5 7.4-6 11-2.6 2-2 5.6-2.5 8 2.6z"/><g class="a-wind"><path class="st thin2" d="M4 9.6h8.6a2.1 2.1 0 1 0-2.1-2.1"/></g><g class="a-wind w2"><path class="st thin2" d="M6.5 13h10.2a2.1 2.1 0 1 1-2.1 2.1"/></g>`,
+  star: `<g class="a-spinslow"><path class="fl" d="M11 3l1.9 7 7 1.9-7 1.9-1.9 7-1.9-7-7-1.9 7-1.9z"/></g><path class="solid a-twinkle" d="M19 1.8l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6z"/><g class="a-rays"><path class="st thin" d="M11 .8v1.6M11 21.6v1.6M-.2 12h1.6M20.6 12h1.6"/></g>`,
+  frog: `<g class="a-hop"><path class="fl" d="M4 16.4c0-4 3.6-6.4 8-6.4s8 2.4 8 6.4c0 2.4-3.6 3.8-8 3.8s-8-1.4-8-3.8z"/><circle class="fl" cx="8" cy="9.2" r="2.6"/><circle class="fl" cx="16" cy="9.2" r="2.6"/><circle class="solid" cx="8" cy="9.2" r="1"/><circle class="solid" cx="16" cy="9.2" r="1"/><path class="st thin2" d="M9 15.8c1.8 1.2 4.2 1.2 6 0"/></g><g class="a-croak"><ellipse class="fl" cx="12" cy="20.6" rx="2.4" ry="1.3"/></g>`,
+  scarecrow: `<g class="a-sway2"><path class="st" d="M12 9.6v12M4.2 12.6h15.6"/><path class="st thin" d="M4.2 12.6l-1.1 2.1M19.8 12.6l1.1 2.1M12 21.6l-1.4 1M12 21.6l1.4 1"/><circle class="fl" style="stroke-width:1.5" cx="12" cy="7.2" r="2.5"/><g class="a-hat"><path class="st" style="stroke-width:1.5" d="M7.4 4.7h9.2M9.6 4.7 12 1.8l2.4 2.9"/></g></g>`,
+};
+
+const LIST = [
+  ['time','hourglass','#8FD3E8'],['lullaby','crown','#E89AC0'],['prelude','star','#FFE27A'],['bolero','flame','#FF6B45'],
+  ['serenade','drop','#4D9BFF'],['minuet','leaf','#5FC46E'],['requiem','dune','#F08A3C'],['nocturne','moon','#B07CFF'],
+  ['epona','horseshoe','#D59A5B'],['saria','fairy','#7FD8B0'],['sun','sun','#F5B942'],['storms','storm','#A9B6D8'],
+];
+let u = 0;
+document.getElementById('grid').innerHTML = LIST.map(([id, icon, c]) => {
+  const hot = id === 'bolero';
+  const prog = hot ? 38 : 100;
+  return `<div class="mw${hot ? ' hot' : ''}" style="--c:${c}">` +
+    (hot ? '<span class="halo"></span>' : '') +
+    `<svg class="ring" viewBox="0 0 100 100"><circle class="ring-track" cx="50" cy="50" r="46"/>` +
+    (hot ? `<circle class="ring-prog" cx="50" cy="50" r="46" pathLength="100" style="stroke-dashoffset:${prog}"/>` : '') + `</svg>` +
+    `<span class="medal"><svg class="ico" viewBox="0 0 24 24">${ICONS[icon].replaceAll('{u}', 'u' + (++u))}</svg></span>` +
+    (hot ? '<span class="rip" style="transform:scale(1.22);opacity:.55"></span><span class="rip" style="transform:scale(1.45);opacity:.25"></span>' : '') +
+    `</div>`;
+}).join('');
+</script>
+</body>
+</html>
