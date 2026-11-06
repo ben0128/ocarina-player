@@ -27,10 +27,10 @@
 
 ## 部署
 
-網站部署在 Cloudflare Pages（直接上傳 `public/`）：
+網站部署在 Cloudflare Workers 的靜態網站（`wrangler.jsonc` 指定上傳 `public/`）：https://ocarina-player.a84012807.workers.dev
 
 ```sh
-npx wrangler pages deploy public --project-name ocarina-player --branch main
+npx wrangler deploy
 ```
 
 ## 按鍵資料來源
