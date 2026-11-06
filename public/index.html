@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>時之笛 譜架</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="《時之笛》Switch 2 版陶笛自動演奏：點一下歌曲，手機吹出旋律，靠近 Switch 2 麥克風讓林克照著吹。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="時之笛 譜架">
+<meta property="og:description" content="點一下歌曲，手機吹出旋律，靠近 Switch 2 麥克風讓林克照著吹。14 首陶笛曲、Switch 2 按鍵樂譜、稻草人之歌編曲。">
+<meta property="og:url" content="https://ocarina-player.a84012807.workers.dev/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
@@ -317,6 +322,10 @@ h1{
 /* ---------- footer & toast ---------- */
 footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--parch-dim)}
 footer p{margin:0}
+.gh{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;color:var(--parch);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;margin-bottom:6px;transition:border-color .15s,color .15s}
+.gh:hover{border-color:var(--gold-soft);color:var(--gold)}
+.gh:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.gh svg{width:16px;height:16px;fill:currentColor;flex:none}
 .toast{
   position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom, 0px));transform:translate(-50%,12px);
   max-width:calc(100% - 32px);background:var(--stone-2);border:1px solid var(--gold-soft);border-radius:999px;
@@ -387,6 +396,8 @@ footer p{margin:0}
   <main id="board" aria-label="歌曲"></main>
 
   <footer>
+    <a class="gh" href="https://github.com/ben0128/ocarina-player" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub：ben0128/ocarina-player</span></a>
+    <p>有 bug 或想加的功能，歡迎到 GitHub 開 issue。</p>
     <p>按鍵是 Switch 2 的預設配置，五個音由低到高是 L R A Y X。薩爾達的搖籃曲和時之歌有任天堂官方截圖可以對照，其他歌照原版旋律換算。網頁靠聲音讓遊戲辨識，跟按鍵配置無關。</p>
     <p>長按 icon 約 0.3 秒可以拖曳排序。釘選、順序、設定和稻草人旋律都存在這個瀏覽器裡。</p>
     <p>非官方玩家工具，與任天堂無關。</p>
@@ -403,32 +414,32 @@ footer p{margin:0}
 /* ================= data ================= */
 const KEYS = ['L', 'R', 'A', 'Y', 'X'];          // low → high
 const MIDI = [74, 77, 81, 83, 86];                // D5 F5 A5 B5 D6
-const CATS = [
+const CATS = [            // ordered by how often players need them in a playthrough
   { id: 'mech',   name: '開啟機關' },
-  { id: 'sky',    name: '時間與天氣' },
-  { id: 'call',   name: '召喚與溝通' },
   { id: 'warp',   name: '傳送' },
-  { id: 'mini',   name: '小遊戲' },
+  { id: 'call',   name: '召喚與溝通' },
+  { id: 'sky',    name: '時間與天氣' },
   { id: 'custom', name: '自訂' },
+  { id: 'mini',   name: '小遊戲' },
 ];
 const SONGS = [
-  { id: 'lullaby',  cat: 'mech', name: '薩爾達的搖籃曲', en: "Zelda's Lullaby",   icon: 'crown',     c: '#E89AC0', notes: [3,4,2,3,4,2], use: '證明與王族的關係，打開刻有王家紋章的機關', learn: '英帕・海拉魯城堡中庭' },
   { id: 'time',     cat: 'mech', name: '時之歌',         en: 'Song of Time',      icon: 'hourglass', c: '#8FD3E8', notes: [2,0,1,2,0,1], use: '打開時之門，移動刻有時之紋的藍色石塊', learn: '薩爾達・城下町外的護城河' },
-  { id: 'sun',      cat: 'sky',  name: '太陽之歌',       en: "Sun's Song",        icon: 'sun',       c: '#F5B942', notes: [2,1,4,2,1,4], use: '白天和黑夜互換，定住殭屍類敵人', learn: '卡卡利科村墓地・王家之墓' },
-  { id: 'storms',   cat: 'sky',  name: '風暴之歌',       en: 'Song of Storms',    icon: 'storm',     c: '#A9B6D8', notes: [0,1,4,0,1,4], use: '招來大雨，打開隱藏洞穴', learn: '卡卡利科村風車小屋（長大後）' },
-  { id: 'epona',    cat: 'call', name: '艾波娜之歌',     en: "Epona's Song",      icon: 'horseshoe', c: '#D59A5B', notes: [4,3,2,4,3,2], use: '長大後呼叫愛馬，讓乳牛給牛奶', learn: '瑪蓉・隆隆牧場' },
-  { id: 'saria',    cat: 'call', name: '沙莉亞之歌',     en: "Saria's Song",      icon: 'fairy',     c: '#7FD8B0', notes: [1,2,3,1,2,3], use: '跟沙莉亞遠距通話聽提示，讓達爾尼亞跳舞', learn: '沙莉亞・聖森林草原' },
-  { id: 'minuet',   cat: 'warp', name: '森林小步舞曲',   en: 'Minuet of Forest',  icon: 'leaf',      c: '#5FC46E', notes: [0,4,3,2,3,2], use: '傳送到聖森林草原（森林神殿入口）', learn: '席克・聖森林草原' },
+  { id: 'lullaby',  cat: 'mech', name: '薩爾達的搖籃曲', en: "Zelda's Lullaby",   icon: 'crown',     c: '#E89AC0', notes: [3,4,2,3,4,2], use: '證明與王族的關係，打開刻有王家紋章的機關', learn: '英帕・海拉魯城堡中庭' },
+  { id: 'prelude',  cat: 'warp', name: '光之前奏曲',     en: 'Prelude of Light',  icon: 'star',      c: '#FFE27A', notes: [4,2,4,2,3,4], use: '傳送到時之神殿', learn: '席克・時之神殿' },
   { id: 'bolero',   cat: 'warp', name: '火焰波麗露',     en: 'Bolero of Fire',    icon: 'flame',     c: '#FF6B45', notes: [1,0,1,0,2,1,2,1], use: '傳送到死亡山火山口', learn: '席克・死亡山火山口' },
   { id: 'serenade', cat: 'warp', name: '水之小夜曲',     en: 'Serenade of Water', icon: 'drop',      c: '#4D9BFF', notes: [0,1,2,2,3], use: '傳送到海利亞湖', learn: '席克・冰之洞窟' },
-  { id: 'nocturne', cat: 'warp', name: '暗影夜曲',       en: 'Nocturne of Shadow',icon: 'moon',      c: '#B07CFF', notes: [3,2,2,0,3,2,1], use: '傳送到卡卡利科村墓地', learn: '席克・卡卡利科村' },
+  { id: 'minuet',   cat: 'warp', name: '森林小步舞曲',   en: 'Minuet of Forest',  icon: 'leaf',      c: '#5FC46E', notes: [0,4,3,2,3,2], use: '傳送到聖森林草原（森林神殿入口）', learn: '席克・聖森林草原' },
   { id: 'requiem',  cat: 'warp', name: '魂之安魂曲',     en: 'Requiem of Spirit', icon: 'dune',      c: '#F08A3C', notes: [0,1,0,2,1,0], use: '傳送到沙漠巨像', learn: '席克・沙漠巨像' },
-  { id: 'prelude',  cat: 'warp', name: '光之前奏曲',     en: 'Prelude of Light',  icon: 'star',      c: '#FFE27A', notes: [4,2,4,2,3,4], use: '傳送到時之神殿', learn: '席克・時之神殿' },
+  { id: 'nocturne', cat: 'warp', name: '暗影夜曲',       en: 'Nocturne of Shadow',icon: 'moon',      c: '#B07CFF', notes: [3,2,2,0,3,2,1], use: '傳送到卡卡利科村墓地', learn: '席克・卡卡利科村' },
+  { id: 'epona',    cat: 'call', name: '艾波娜之歌',     en: "Epona's Song",      icon: 'horseshoe', c: '#D59A5B', notes: [4,3,2,4,3,2], use: '長大後呼叫愛馬，讓乳牛給牛奶', learn: '瑪蓉・隆隆牧場' },
+  { id: 'saria',    cat: 'call', name: '沙莉亞之歌',     en: "Saria's Song",      icon: 'fairy',     c: '#7FD8B0', notes: [1,2,3,1,2,3], use: '跟沙莉亞遠距通話聽提示，讓達爾尼亞跳舞', learn: '沙莉亞・聖森林草原' },
+  { id: 'sun',      cat: 'sky',  name: '太陽之歌',       en: "Sun's Song",        icon: 'sun',       c: '#F5B942', notes: [2,1,4,2,1,4], use: '白天和黑夜互換，定住殭屍類敵人', learn: '卡卡利科村墓地・王家之墓' },
+  { id: 'storms',   cat: 'sky',  name: '風暴之歌',       en: 'Song of Storms',    icon: 'storm',     c: '#A9B6D8', notes: [0,1,4,0,1,4], use: '招來大雨，打開隱藏洞穴', learn: '卡卡利科村風車小屋（長大後）' },
+  { id: 'scarecrow',cat: 'custom', name: '稻草人之歌',   en: "Scarecrow's Song",  icon: 'scarecrow', c: '#C9B37A', notes: null, custom: true,
+    use: '小時候在海利亞湖教稻草人一段 8 個音的旋律，長大後吹給它聽，它就會出現，可以當鉤爪的落點', learn: '海利亞湖的稻草人' },
   { id: 'frogs',    cat: 'mini', name: '青蛙之歌',       en: "Zora's River Frogs", icon: 'frog',     c: '#9BD45A', notes: [0,3,2,1,3,2,1,0,1,0,1,2,3,0],
     use: '在索拉河對 5 隻青蛙吹這段 14 個音，完成可以拿到心之碎片', learn: '索拉河的青蛙（小時候）',
     tip: '這個小遊戲要跟著青蛙的提示一個音一個音吹，接不上的話把速度調慢' },
-  { id: 'scarecrow',cat: 'custom', name: '稻草人之歌',   en: "Scarecrow's Song",  icon: 'scarecrow', c: '#C9B37A', notes: null, custom: true,
-    use: '小時候在海利亞湖教稻草人一段 8 個音的旋律，長大後吹給它聽，它就會出現，可以當鉤爪的落點', learn: '海利亞湖的稻草人' },
 ];
 const BY = Object.fromEntries(SONGS.map(s => [s.id, s]));
 
@@ -465,15 +476,17 @@ function load() {
   let s = {};
   try { s = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) { s = {}; }
   const pinned = [...new Set((Array.isArray(s.pinned) ? s.pinned : []).filter(id => BY[id]))];
-  const order = {};
+  const order = {}, customOrder = {};
+  const custom = s.customOrder && typeof s.customOrder === 'object' ? s.customOrder : {};
   CATS.forEach(c => {
     const ids = SONGS.filter(x => x.cat === c.id).map(x => x.id);
-    const saved = s.order && Array.isArray(s.order[c.id]) ? s.order[c.id].filter(id => ids.includes(id)) : [];
+    const saved = custom[c.id] === true && s.order && Array.isArray(s.order[c.id]) ? s.order[c.id].filter(id => ids.includes(id)) : [];
+    if (saved.length) customOrder[c.id] = true;
     order[c.id] = [...new Set([...saved, ...ids])];
   });
   const scare = Array.isArray(s.scare) && s.scare.length === 8 && s.scare.every(n => Number.isInteger(n) && n >= 0 && n < 5) ? s.scare : [];
   return {
-    pinned, order, scare,
+    pinned, order, customOrder, scare,
     tempo: clamp(Number(s.tempo) || 0.42, 0.25, 0.8),
     oct: [-1, 0, 1].includes(s.oct) ? s.oct : 0,
     tone: s.tone === 'pure' ? 'pure' : 'ocarina',
@@ -484,6 +497,7 @@ const state = load();
 function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* private mode: keep working without memory */ } }
 
 let openId = null;        // song whose score panel is open
+let openList = null;      // which grid it was opened from (a pinned song shows in two places)
 let editing = false;      // scarecrow composer open
 let draft = [];
 let justDragged = false;
@@ -528,8 +542,7 @@ function render() {
   sortables.forEach(s => s.destroy()); sortables = [];
   let html = sectionHTML('pinned', '釘選', state.pinned, state.pinned.length);
   CATS.forEach(c => {
-    const ids = state.order[c.id].filter(id => !state.pinned.includes(id));
-    html += sectionHTML(c.id, c.name, ids, state.order[c.id].length);
+    html += sectionHTML(c.id, c.name, state.order[c.id], state.order[c.id].length);
   });
   board.innerHTML = html;
   if (window.Sortable) board.querySelectorAll('.grid').forEach(g => sortables.push(makeSortable(g)));
@@ -593,7 +606,9 @@ function placePanel(focusKey) {
     const b = $('.tri', t); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', `展開${BY[t.dataset.id].name}的樂譜`);
   });
   if (!openId) return;
-  const tile = $(`.tile[data-id="${openId}"]`, board); if (!tile) { openId = null; return; }
+  let tile = openList ? $(`.grid[data-list="${openList}"] .tile[data-id="${openId}"]`, board) : null;
+  if (!tile) { openList = BY[openId].cat; tile = $(`.grid[data-list="${openList}"] .tile[data-id="${openId}"]`, board); }
+  if (!tile) { openId = null; openList = null; return; }
   const s = BY[openId];
   const grid = tile.parentElement;
   const tiles = [...grid.querySelectorAll('.tile')];
@@ -613,9 +628,9 @@ function placePanel(focusKey) {
   if (player && player.id === s.id) highlightStaff(player.k);
   if (focusKey != null) { const k = $(`.key[data-key="${focusKey}"]`, panel) || $('[data-action="save"]:not(:disabled)', panel); if (k) k.focus(); }
 }
-function toggleOpen(id) {
-  if (openId === id) { openId = null; editing = false; }
-  else { openId = id; editing = false; draft = []; }
+function toggleOpen(id, list) {
+  if (openId === id && openList === list) { openId = null; openList = null; editing = false; }
+  else { openId = id; openList = list; editing = false; draft = []; }
   placePanel();
 }
 function highlightStaff(k) {
@@ -696,9 +711,9 @@ function pulse(id) {
     const m = $('.medal', mw); m.classList.remove('bump'); void m.offsetWidth; m.classList.add('bump');
   });
 }
-function play(id) {
+function play(id, list) {
   const s = BY[id];
-  if (!hasMelody(s)) { stop(); openId = id; editing = true; draft = []; placePanel(); return; }
+  if (!hasMelody(s)) { stop(); openId = id; openList = list || s.cat; editing = true; draft = []; placePanel(); return; }
   whenReady(() => {
     stop();
     const notes = notesOf(s);
@@ -755,7 +770,7 @@ function saveOrder(grid) {
   const list = grid.dataset.list;
   const ids = [...grid.querySelectorAll('.tile')].map(t => t.dataset.id);
   if (list === 'pinned') state.pinned = ids;
-  else { let k = 0; state.order[list] = state.order[list].map(id => state.pinned.includes(id) ? id : ids[k++]); }
+  else { state.order[list] = ids; state.customOrder[list] = true; }
   save();
 }
 function makeSortable(grid) {
@@ -777,8 +792,9 @@ board.addEventListener('click', e => {
   const tile = e.target.closest('.tile'); if (!tile) return;
   const id = tile.dataset.id;
   if (e.target.closest('.sword')) return togglePin(id);
-  if (e.target.closest('.tri')) return toggleOpen(id);
-  if (e.target.closest('.tile-play')) { if (player && player.id === id) stop(); else play(id); }
+  const list = tile.parentElement.dataset.list;
+  if (e.target.closest('.tri')) return toggleOpen(id, list);
+  if (e.target.closest('.tile-play')) { if (player && player.id === id) stop(); else play(id, list); }
 });
 function onAction(btn) {
   const a = btn.dataset.action, s = BY[openId]; if (!s) return;
@@ -795,8 +811,8 @@ function onAction(btn) {
 }
 board.addEventListener('keydown', e => {
   if (e.key === 'Escape' && openId) {
-    const id = openId; openId = null; editing = false; placePanel();
-    const t = $(`.tile[data-id="${id}"] .tri`); if (t) t.focus(); return;
+    const id = openId, list = openList; openId = null; openList = null; editing = false; placePanel();
+    const t = $(`.grid[data-list="${list}"] .tile[data-id="${id}"] .tri`); if (t) t.focus(); return;
   }
   if (!e.altKey) return;
   const dir = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key]; if (!dir) return;
