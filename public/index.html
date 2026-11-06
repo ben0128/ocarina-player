@@ -19,7 +19,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
 <style>
-/* Layout: phone-first single column (max 520px) — header with collapsible settings, then sections of 3-column icon grids; an expanded score panel spans the full row under the tapped icon */
+/* Layout: phone-first single column (max 520px) — header with collapsible settings, then sections of 3-column icon grids; an expanded score panel spans the full row under the tapped icon.
+   ≥768px: 6 columns (warp, the largest category, has 6 songs, so every category is one row); header splits into steps | settings; score panel splits into score | info.
+   ≥1200px: header becomes a sticky 280px sidebar, songs fill the right column. */
 :root{
   color-scheme: dark;
   --night:#0b141c;
@@ -92,7 +94,7 @@ h1{
 .cat h2::before{content:"";flex:none;width:7px;height:7px;transform:rotate(45deg);background:var(--gold)}
 .cat h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),rgba(42,59,73,0))}
 .cat h2 .count{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--parch-dim)}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 12px;padding-top:30px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 12px;padding:30px 8px 0 0} /* right padding: room for the corner sword so the page never scrolls sideways */
 .grid:empty{display:none}
 .empty{margin:14px 0 0;font-size:13px;color:var(--parch-dim);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;text-align:center}
 
@@ -276,6 +278,9 @@ h1{
 .btn.primary{background:var(--gold);border-color:var(--gold);color:#1b1405;font-weight:700}
 .btn:disabled{opacity:.4;cursor:default}
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+/* panel body: flattened on phones (score, info, then play); split score | info on wide screens */
+.p-body,.p-main,.composer{display:contents}
+.p-main > .playbtn,.p-main > .p-actions{order:1}
 .p-actions{display:flex;gap:8px;align-items:center}
 .p-actions .playbtn{flex:1}
 .p-actions .btn{height:54px;border-radius:12px;flex:none}
@@ -338,6 +343,31 @@ footer p{margin:0}
   opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:20;
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- wide screens ---------- */
+@media (min-width:768px){
+  .app{max-width:960px}
+  .top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 28px;align-items:start}
+  .brand,.how{grid-column:1}
+  .settings{grid-column:2;grid-row:1 / span 2;align-self:end}
+  .grid{grid-template-columns:repeat(6,minmax(0,1fr));column-gap:14px}
+  .p-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px 28px;align-items:start}
+  .p-main{display:flex;flex-direction:column;gap:14px}
+  /* scarecrow composer: input on the left, rules on the right */
+  .composer{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px 28px;align-items:start}
+  .composer > *{grid-column:1}
+  .composer > .c-intro{grid-column:2;grid-row:1 / span 4}
+}
+@media (min-width:1200px){
+  .app{max-width:1240px;display:grid;grid-template-columns:280px minmax(0,1fr);column-gap:44px;align-items:start}
+  .top{
+    grid-column:1;grid-row:1 / span 2;display:flex;flex-direction:column;gap:14px;padding:0 2px 6px;
+    position:sticky;top:max(20px, env(safe-area-inset-top, 0px));max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;
+  }
+  .settings{align-self:stretch}
+  #board,footer{grid-column:2}
+  #board > .cat:first-child{margin-top:0}
+}
 
 @media (prefers-reduced-motion: reduce){
   .ico *, .medal.bump, .spark, .just-pinned .sword svg{animation:none !important}
@@ -496,6 +526,7 @@ function load() {
     oct: [-1, 0, 1].includes(s.oct) ? s.oct : 0,
     tone: s.tone === 'pure' ? 'pure' : 'ocarina',
     vol: Number.isFinite(Number(s.vol)) && s.vol !== null ? clamp(Number(s.vol), 0, 1) : 0.8,
+    sideOpen: s.sideOpen !== false,
   };
 }
 const state = load();
@@ -585,7 +616,7 @@ function panelHTML(s) {
     const d = draft, prob = scareProblem(d);
     const slots = Array.from({ length: 8 }, (_, i) => i < d.length ? glyph(d[i]) : '<span class="g empty" style="--p:2"></span>').join('');
     const keys = KEYS.map((k, i) => `<button type="button" class="key${i < 2 ? ' sh' : ''}" data-action="key" data-key="${i}"${d.length >= 8 ? ' disabled' : ''} aria-label="加入 ${k}">${k}</button>`).join('');
-    return head +
+    return head + '<div class="composer">' +
       `<p class="c-intro">輸入你在遊戲裡教稻草人的 8 個音，或先在這裡編好，再播給它聽。每點一個鍵會播出那個音。規則：8 個音不能全部一樣，也不能包含其他歌曲的旋律。</p>` +
       `<div class="staff" style="--n:8">${slots}</div>` +
       `<div class="c-status"><span>已輸入 <b>${d.length}</b> / 8</span><code>${d.length ? d.map(n => KEYS[n]).join(' ') : '還沒輸入'}</code></div>` +
@@ -594,7 +625,7 @@ function panelHTML(s) {
       `<div class="c-actions"><button type="button" class="btn" data-action="undo"${d.length ? '' : ' disabled'}>刪除上一個</button>` +
       `<button type="button" class="btn" data-action="clear"${d.length ? '' : ' disabled'}>清除</button>` +
       (hasMelody(s) ? '<button type="button" class="btn" data-action="cancel">取消</button>' : '') +
-      `<button type="button" class="btn primary" data-action="save"${d.length === 8 && !prob ? '' : ' disabled'}>儲存</button></div>`;
+      `<button type="button" class="btn primary" data-action="save"${d.length === 8 && !prob ? '' : ' disabled'}>儲存</button></div></div>`;
   }
   const notes = notesOf(s);
   const staff = staffHTML(notes);
@@ -602,7 +633,7 @@ function panelHTML(s) {
   const actions = s.custom
     ? `<div class="p-actions"><button type="button" class="btn" data-action="edit">重新編曲</button><button type="button" class="playbtn" data-action="play">${playBtnHTML(s)}</button></div>`
     : `<button type="button" class="playbtn" data-action="play">${playBtnHTML(s)}</button>`;
-  return head + staff + backup + infoHTML(s) + actions;
+  return head + `<div class="p-body"><div class="p-main">${staff}${backup}${actions}</div>${infoHTML(s)}</div>`;
 }
 function placePanel(focusKey) {
   const old = $('#panel'); if (old) old.remove();
@@ -847,6 +878,10 @@ document.querySelectorAll('input[name="oct"]').forEach(r => r.addEventListener('
 document.querySelectorAll('input[name="tone"]').forEach(r => r.addEventListener('change', () => { state.tone = r.value; syncSettings(); save(); }));
 
 syncSettings();
+// Desktop sidebar: settings start open; remember if the player collapses them there.
+const WIDE = matchMedia('(min-width:1200px)');
+if (WIDE.matches && state.sideOpen) $('#settings').open = true;
+$('#settings').addEventListener('toggle', () => { if (WIDE.matches) { state.sideOpen = $('#settings').open; save(); } });
 render();
 })();
 </script>
