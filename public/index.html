@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>時之笛 譜架</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* Layout: phone-first single column (max 520px) — header with collapsible settings, then sections of 3-column icon grids; an expanded score panel spans the full row under the tapped icon */
+:root{
+  color-scheme: dark;
+  --night:#0b141c;
+  --stone:#131f29;
+  --stone-2:#1a2834;
+  --line:#2a3b49;
+  --gold:#d9b55e;
+  --gold-soft:#9c8143;
+  --gold-hi:#f3d68c;
+  --parch:#ece2c6;
+  --parch-dim:#a8a28f;
+  --staffline:rgba(236,226,198,.24);
+  --f-display:"Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-latin:"Cinzel","Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:radial-gradient(140% 40% at 50% -6%, #1c3242 0%, rgba(28,50,66,0) 64%), var(--night);
+  background-color:var(--night);
+  color:var(--parch);
+  font:15px/1.6 var(--f-body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:20px 48px;
+  -webkit-text-size-adjust:100%;
+}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- header ---------- */
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:6px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.eyebrow{font-family:var(--f-latin);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+h1{
+  margin:0;font-family:var(--f-display);font-weight:700;font-size:32px;line-height:1.2;letter-spacing:.06em;
+  background:linear-gradient(180deg,#f4de9a 10%,#c4963b 90%);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.how{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;counter-reset:s;font-size:13px;color:var(--parch-dim)}
+.how li{counter-increment:s;display:flex;gap:8px;align-items:baseline}
+.how li::before{content:counter(s);flex:none;width:18px;height:18px;border-radius:50%;border:1px solid var(--gold-soft);color:var(--gold);font:700 10.5px/16px var(--f-latin);text-align:center;transform:translateY(-1px)}
+.how b{color:var(--parch);font-weight:500}
+
+.settings{border:1px solid var(--line);border-radius:12px;background:var(--stone)}
+.settings summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13.5px}
+.settings summary::-webkit-details-marker{display:none}
+.settings summary .lbl{color:var(--gold);font-weight:500;flex:none}
+.settings summary .sum{color:var(--parch-dim);font-size:12.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settings summary .chev{flex:none;width:10px;height:10px;border-right:1.5px solid var(--parch-dim);border-bottom:1.5px solid var(--parch-dim);transform:rotate(45deg) translateY(-3px);transition:transform .2s}
+.settings[open] summary .chev{transform:rotate(-135deg) translateY(-1px)}
+.settings summary:focus-visible{outline:2px solid var(--gold);outline-offset:-2px;border-radius:12px}
+.set-body{display:flex;flex-direction:column;gap:14px;padding:4px 14px 14px;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:10px;padding-top:10px}
+.row > span:first-child{font-size:13px;color:var(--parch-dim)}
+.range{display:flex;align-items:center;gap:10px}
+.range input{flex:1;min-width:0;accent-color:var(--gold)}
+.range output{flex:none;width:58px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums;color:var(--parch)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px}
+.seg label{position:relative;text-align:center;font-size:13px;border-radius:999px;padding:5px 4px;cursor:pointer;color:var(--parch-dim)}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg label:has(input:checked){background:var(--gold);color:#1b1405;font-weight:700}
+.seg label:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.set-note{font-size:12px;color:var(--parch-dim);margin:0}
+
+/* ---------- sections & grid ---------- */
+.cat{display:flex;flex-direction:column;margin-top:18px}
+.cat h2{margin:0;font-family:var(--f-display);font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:9px}
+.cat h2::before{content:"";flex:none;width:7px;height:7px;transform:rotate(45deg);background:var(--gold)}
+.cat h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),rgba(42,59,73,0))}
+.cat h2 .count{font-family:var(--f-body);font-weight:400;font-size:12px;color:var(--parch-dim)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 12px;padding-top:30px}
+.grid:empty{display:none}
+.empty{margin:14px 0 0;font-size:13px;color:var(--parch-dim);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;text-align:center}
+
+/* ---------- tile ---------- */
+.tile{
+  position:relative;display:flex;flex-direction:column;border-radius:12px;background:var(--stone);border:1px solid var(--line);
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:border-color .25s, background-color .25s;
+}
+.tile.playing{border-color:color-mix(in srgb, var(--c) 55%, var(--line))}
+.tile.open{border-color:var(--gold-soft);background:var(--stone-2)}
+.tile-play{
+  display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:12px 4px 8px;
+  border:0;background:none;cursor:pointer;border-radius:12px 12px 0 0;touch-action:manipulation;
+}
+.tile-play:active .mw{transform:scale(.95)}
+.tile-play:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.tname{font-size:12.5px;line-height:1.3;text-align:center;min-height:2.6em;display:flex;align-items:center;padding-inline:2px}
+.badge{position:absolute;top:8px;left:8px;font-size:10px;font-weight:700;line-height:1.6;color:var(--night);background:var(--gold);border-radius:4px;padding:0 5px}
+
+/* drag states (SortableJS) */
+.drag-ghost{opacity:.3}
+.drag-chosen .tile-play .mw{transform:scale(1.06)}
+.sortable-fallback{box-shadow:0 18px 40px rgba(0,0,0,.55);transform:rotate(2deg)}
+
+/* ---------- medallion: halo + progress ring + medal + ripples + finish spark ---------- */
+.mw{--s:48px;position:relative;width:calc(var(--s) + 12px);height:calc(var(--s) + 12px);display:inline-grid;place-items:center;flex:none;transition:transform .12s}
+.halo{position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb, var(--c) 42%, transparent) 0%, transparent 66%);opacity:0;transition:opacity .35s}
+.ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.ring circle{fill:none}
+.ring-track{stroke:var(--gold-soft);stroke-width:2}
+.ring-prog{stroke:var(--gold-hi);stroke-width:4.6;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;opacity:0;transition:opacity .5s .15s}
+.medal{
+  position:relative;width:var(--s);height:var(--s);border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%), var(--stone-2);
+  border:1.5px solid color-mix(in srgb, var(--c) 72%, transparent);
+}
+.medal.bump{animation:bump .28s ease-out}
+.ripples{position:absolute;inset:0;pointer-events:none}
+.rip{
+  position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  border-radius:50%;border:2px solid var(--c);box-shadow:0 0 12px color-mix(in srgb, var(--c) 60%, transparent);
+  animation:rip .75s ease-out forwards;
+}
+.spark{position:absolute;left:50%;top:-9px;width:18px;height:18px;margin-left:-9px;opacity:0;fill:#fff3c4;filter:drop-shadow(0 0 4px #f3d68c);pointer-events:none}
+.playing .halo{opacity:1}
+.playing .ring-prog{opacity:1;transition:none}
+.finish .spark{animation:spark .75s ease-out}
+@keyframes bump{35%{transform:scale(1.08)}}
+@keyframes rip{from{transform:scale(1);opacity:.9}to{transform:scale(1.75);opacity:0}}
+@keyframes spark{0%{opacity:0;transform:scale(.2) rotate(0)}40%{opacity:1;transform:scale(1.5) rotate(45deg)}100%{opacity:0;transform:scale(.6) rotate(90deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.ico{width:calc(var(--s) * .56);height:calc(var(--s) * .56);display:block;color:var(--c);overflow:visible}
+.ico *{transform-box:fill-box}
+.ico .fl{fill:currentColor;fill-opacity:.25;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+.ico .st{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ico .thin2{stroke-width:1.4}
+.ico .thin{stroke-width:1}
+.ico .solid{fill:currentColor}
+.ico .hole{fill:var(--stone-2)}
+
+/* per-icon motion while playing: transform and opacity only, 1–2 s loops */
+.a-sheen,.a-gemspark,.a-grains,.a-ember,.a-moonglow,.a-rays,.a-croak{opacity:0}
+.playing .a-sheen{animation:sheen 1.8s ease-in-out infinite}
+.playing .a-gem{animation:gem 1.8s ease-in-out infinite;transform-origin:50% 50%}
+.playing .a-gemspark{animation:gemspark 1.8s ease-in-out infinite;transform-origin:50% 50%}
+.playing .a-flip{animation:flip 2.6s ease-in-out infinite;transform-origin:50% 50%}
+.playing .a-sand-top{animation:sandtop 2.6s linear infinite;transform-origin:50% 100%}
+.playing .a-sand-bot{animation:sandbot 2.6s linear infinite;transform-origin:50% 100%}
+.playing .a-grains{animation:grainsvis 2.6s steps(1) infinite}
+.playing .a-grain{animation:grain .5s linear infinite}
+.playing .g2{animation-delay:.25s}
+.playing .a-spin{animation:spin 8s linear infinite;transform-origin:50% 50%}
+.playing .a-breathe{animation:breathe 1.6s ease-in-out infinite;transform-origin:50% 50%}
+.playing .a-drift{animation:drift 3s ease-in-out infinite}
+.playing .a-bolt{animation:bolt 1.8s linear infinite}
+.playing .a-gallop{animation:gallop .6s cubic-bezier(.3,0,.4,1) infinite;transform-origin:50% 100%}
+.playing .a-hover{animation:hover 2.4s ease-in-out infinite}
+.playing .a-wing-l{animation:wing .18s ease-in-out infinite alternate;transform-origin:100% 50%}
+.playing .a-wing-r{animation:wing .18s ease-in-out infinite alternate;transform-origin:0% 50%}
+.playing .a-sway{animation:sway 1.8s ease-in-out infinite;transform-origin:0% 100%}
+.playing .a-flicker{animation:flicker .42s ease-in-out infinite alternate;transform-origin:50% 100%}
+.playing .a-flicker2{animation:flicker .26s ease-in-out infinite alternate-reverse;transform-origin:50% 100%}
+.playing .a-ember{animation:ember 1.3s ease-out infinite}
+.playing .e2{animation-delay:.43s}
+.playing .e3{animation-delay:.86s}
+.playing .a-bob{animation:bob 1.6s ease-in-out infinite}
+.playing .a-wave{animation:wave 1.4s ease-in-out infinite}
+.playing .a-moonglow{animation:moonglow 2.4s ease-in-out infinite}
+.playing .a-twinkle{animation:twinkle 1.2s ease-in-out infinite;transform-origin:50% 50%}
+.playing .t2{animation-delay:.6s}
+.playing .a-wind{animation:wind 1.4s ease-in-out infinite}
+.playing .w2{animation-delay:.35s}
+.playing .a-spinslow{animation:spin 6s linear infinite;transform-origin:50% 50%}
+.playing .a-rays{animation:rays 1.2s ease-out infinite;transform-origin:50% 50%}
+.playing .a-sway2{animation:sway2 1.6s ease-in-out infinite;transform-origin:50% 100%}
+.playing .a-hat{animation:hat 1.6s ease-in-out .12s infinite;transform-origin:50% 100%}
+.playing .a-hop{animation:hop .7s ease-in-out infinite;transform-origin:50% 100%}
+.playing .a-croak{animation:croak .7s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes sheen{0%{transform:translateX(0);opacity:0}8%{opacity:.55}50%{transform:translateX(16px);opacity:.55}56%,100%{transform:translateX(16px);opacity:0}}
+@keyframes gem{0%,20%{transform:scale(1)}32%{transform:scale(1.35)}45%,100%{transform:scale(1)}}
+@keyframes gemspark{0%,22%{opacity:0;transform:scale(.2) rotate(0)}32%{opacity:1;transform:scale(1.2) rotate(45deg)}48%,100%{opacity:0;transform:scale(.4) rotate(90deg)}}
+@keyframes flip{0%,74%{transform:rotate(0)}96%,100%{transform:rotate(180deg)}}
+@keyframes sandtop{0%{transform:scaleY(1)}72%,100%{transform:scaleY(.12)}}
+@keyframes sandbot{0%{transform:scale(.35)}72%,100%{transform:scale(1)}}
+@keyframes grainsvis{0%{opacity:1}72%,100%{opacity:0}}
+@keyframes grain{0%{transform:translateY(0);opacity:1}100%{transform:translateY(5px);opacity:.2}}
+@keyframes breathe{50%{transform:scale(1.12)}}
+@keyframes drift{50%{transform:translateX(1.2px)}}
+@keyframes bolt{0%,58%{opacity:.25}60%{opacity:1}64%{opacity:.35}67%{opacity:1}74%,100%{opacity:.25}}
+@keyframes gallop{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-2.4px) rotate(-8deg)}60%{transform:translateY(-1px) rotate(6deg)}}
+@keyframes hover{0%,100%{transform:translate(0,0)}25%{transform:translate(.8px,-1.2px)}75%{transform:translate(-.8px,-.6px)}}
+@keyframes wing{to{transform:scaleX(.55)}}
+@keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(7deg)}}
+@keyframes flicker{0%{transform:scale(1,1) skewX(0)}50%{transform:scale(.95,1.1) skewX(-4deg)}100%{transform:scale(1.04,.94) skewX(3deg)}}
+@keyframes ember{0%{opacity:0;transform:translateY(5px)}25%{opacity:1}100%{opacity:0;transform:translate(1.5px,-4px)}}
+@keyframes bob{50%{transform:translateY(-1.4px)}}
+@keyframes wave{0%,100%{transform:translateX(-1.1px)}50%{transform:translateX(1.1px)}}
+@keyframes moonglow{0%,100%{opacity:0}50%{opacity:.45}}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.4)}}
+@keyframes wind{0%{transform:translateX(-2px);opacity:.25}45%{opacity:1}100%{transform:translateX(2.6px);opacity:.25}}
+@keyframes rays{0%,100%{opacity:0;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
+@keyframes sway2{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes hat{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+@keyframes hop{0%,100%{transform:translateY(0) scale(1.04,.94)}40%{transform:translateY(-2.4px) scale(.97,1.04)}70%{transform:translateY(0) scale(1,1)}}
+@keyframes croak{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.9;transform:scale(1.15)}}
+
+/* ---------- sword pin ---------- */
+.sword{position:absolute;right:-10px;top:-44px;width:40px;height:60px;padding:0;border:0;background:none;cursor:pointer;z-index:2;border-radius:6px;touch-action:manipulation}
+.sword svg{
+  position:absolute;left:6.75px;top:12.4px;width:22.5px;height:47.8px;overflow:visible;
+  transform-origin:11.25px 43.6px;transform:rotate(32deg) translateY(-8px);
+  opacity:.4;filter:saturate(.3);
+  transition:transform .34s cubic-bezier(.3,1.8,.5,1), opacity .2s;
+}
+.sword:hover svg{opacity:.8}
+.sword[aria-pressed="true"] svg{transform:rotate(32deg) translateY(0);opacity:1;filter:drop-shadow(0 0 4px rgba(217,181,94,.55))}
+.just-pinned .sword svg{animation:plunge .42s cubic-bezier(.3,1.8,.5,1)}
+@keyframes plunge{from{transform:rotate(32deg) translateY(-16px);opacity:.5}to{transform:rotate(32deg) translateY(0);opacity:1}}
+.sword .slit{fill:#03070b;stroke:rgba(236,226,198,.28);stroke-width:.35;opacity:0;transition:opacity .2s .16s}
+.sword[aria-pressed="true"] .slit{opacity:.9}
+.sword .blade{fill:url(#blade-g)}
+.sword .fuller{stroke:#7f8ea2;stroke-width:.6}
+.sword .guard,.sword .pommel{fill:var(--gold)}
+.sword .grip{fill:#7a5230}
+.sword:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------- triforce expander ---------- */
+.tri{width:100%;height:34px;padding:0;border:0;border-top:1px solid var(--line);background:transparent;border-radius:0 0 11px 11px;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.tri svg{width:18px;height:16px;fill:transparent;stroke:var(--gold-soft);stroke-width:1.4;stroke-linejoin:round;transition:fill .2s, stroke .2s, filter .2s}
+.tri:hover svg{stroke:var(--gold)}
+.tri[aria-expanded="true"] svg{fill:var(--gold);stroke:var(--gold);filter:drop-shadow(0 0 5px rgba(217,181,94,.75))}
+.tri:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
+/* ---------- score panel ---------- */
+.panel{
+  --nx:50%;position:relative;grid-column:1/-1;margin-top:-18px;
+  border:1px solid var(--gold-soft);border-radius:14px;background:var(--stone-2);
+  padding:16px 14px 14px;display:flex;flex-direction:column;gap:14px;
+}
+.panel::before{content:"";position:absolute;top:-7px;left:var(--nx);width:12px;height:12px;margin-left:-6px;background:var(--stone-2);border-left:1px solid var(--gold-soft);border-top:1px solid var(--gold-soft);transform:rotate(45deg)}
+.p-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.p-head b{font-family:var(--f-display);font-size:17px}
+.en{font-family:var(--f-latin);font-size:11px;letter-spacing:.08em;color:var(--parch-dim)}
+.p-info{margin:0;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.55}
+.p-info div{display:grid;grid-template-columns:52px minmax(0,1fr);gap:8px}
+.p-info dt{color:var(--gold);font-size:12.5px}
+.p-info dd{margin:0}
+.playbtn{
+  position:relative;overflow:hidden;width:100%;height:54px;border-radius:12px;cursor:pointer;
+  border:1px solid var(--gold);background:linear-gradient(180deg,#e9c873,#c99d3f);color:#1b1405;
+  display:flex;align-items:center;justify-content:center;gap:10px;font:700 17px/1 var(--f-body);letter-spacing:.08em;touch-action:manipulation;
+}
+.playbtn::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--prog,0%);background:rgba(255,255,255,.3)}
+.playbtn > *{position:relative}
+.playbtn svg{width:16px;height:16px;fill:currentColor}
+.playbtn small{font:500 12.5px/1 var(--f-body);opacity:.75;letter-spacing:0;font-variant-numeric:tabular-nums}
+.playbtn:active{filter:brightness(.95)}
+.playbtn:focus-visible{outline:2px solid var(--parch);outline-offset:2px}
+.btn{border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 14px;font-size:13.5px;cursor:pointer;touch-action:manipulation}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#1b1405;font-weight:700}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.p-actions{display:flex;gap:8px;align-items:center}
+.p-actions .playbtn{flex:1}
+.p-actions .btn{height:54px;border-radius:12px;flex:none}
+
+/* staff with Switch 2 buttons */
+.staff{
+  --gap:11px;--gs:26px;--pad:calc(var(--gs) / 2 + 5px);
+  display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));
+  height:calc(var(--pad) * 2 + var(--gap) * 4);
+  background:
+    linear-gradient(var(--staffline),var(--staffline)) 0 calc(var(--pad) + var(--gap) * 0) / 100% 1px no-repeat,
+    linear-gradient(var(--staffline),var(--staffline)) 0 calc(var(--pad) + var(--gap) * 1) / 100% 1px no-repeat,
+    linear-gradient(var(--staffline),var(--staffline)) 0 calc(var(--pad) + var(--gap) * 2) / 100% 1px no-repeat,
+    linear-gradient(var(--staffline),var(--staffline)) 0 calc(var(--pad) + var(--gap) * 3) / 100% 1px no-repeat,
+    linear-gradient(var(--staffline),var(--staffline)) 0 calc(var(--pad) + var(--gap) * 4) / 100% 1px no-repeat;
+}
+.g{
+  position:relative;justify-self:center;align-self:start;
+  margin-top:calc(var(--pad) + var(--gap) * (4 - var(--p)) - var(--gs) / 2);
+  width:var(--gs);height:var(--gs);border-radius:50%;
+  display:grid;place-items:center;font:700 calc(var(--gs) * .46)/1 var(--f-body);
+  background:#0f1820;border:1.5px solid var(--gold-soft);color:var(--parch);
+  transition:opacity .2s, box-shadow .15s, border-color .15s;
+}
+.g.sh{border-radius:7px 7px 5px 5px;width:calc(var(--gs) * 1.25)}
+.g.on{border-color:var(--parch);box-shadow:0 0 14px 2px color-mix(in srgb, var(--c) 85%, transparent)}
+.g.done{opacity:.45}
+.g.empty{background:transparent;border:1.5px dashed var(--line)}
+.staves{display:flex;flex-direction:column;gap:4px}
+
+/* scarecrow composer */
+.c-intro{margin:0;font-size:13px;color:var(--parch-dim);line-height:1.6}
+.c-status{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--parch-dim)}
+.c-status b{color:var(--parch);font-variant-numeric:tabular-nums}
+.c-status code{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--gold);letter-spacing:.06em}
+.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.key{
+  height:52px;border-radius:50%;width:52px;justify-self:center;border:1.5px solid var(--gold-soft);background:#0f1820;
+  font:700 18px/1 var(--f-body);cursor:pointer;touch-action:manipulation;transition:transform .08s, border-color .15s;
+}
+.key.sh{width:100%;border-radius:12px 12px 9px 9px}
+.key:active{transform:scale(.93);border-color:var(--gold)}
+.key:disabled{opacity:.35;cursor:default}
+.key:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.c-warn{margin:0;font-size:13px;line-height:1.5;color:#ffb38a}
+.c-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.c-actions .btn.primary{min-width:88px}
+
+/* ---------- footer & toast ---------- */
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--parch-dim)}
+footer p{margin:0}
+.toast{
+  position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom, 0px));transform:translate(-50%,12px);
+  max-width:calc(100% - 32px);background:var(--stone-2);border:1px solid var(--gold-soft);border-radius:999px;
+  padding:9px 16px;font-size:13.5px;color:var(--parch);box-shadow:0 10px 30px rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:20;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion: reduce){
+  .ico *, .medal.bump, .spark, .just-pinned .sword svg{animation:none !important}
+  .rip{display:none}
+  .sword svg, .mw{transition:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="blade-g" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#f4f7fb"/><stop offset=".5" stop-color="#c8d2de"/><stop offset="1" stop-color="#8996a8"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Ocarina Songbook</span>
+      <h1>時之笛 譜架</h1>
+    </div>
+    <ol class="how">
+      <li><span>遊戲的「選項」打開 <b>Ocarina Mic Input</b></span></li>
+      <li><span>在遊戲裡<b>拿出陶笛</b></span></li>
+      <li><span>手機靠近 Switch 2，<b>點歌曲 icon</b> 就會吹奏</span></li>
+    </ol>
+    <details class="settings" id="settings">
+      <summary><span class="lbl">演奏設定</span><span class="sum" id="set-sum"></span><span class="chev" aria-hidden="true"></span></summary>
+      <div class="set-body">
+        <div class="row">
+          <span id="lbl-tempo">速度</span>
+          <div class="range"><input type="range" id="tempo" min="0.25" max="0.8" step="0.01" aria-labelledby="lbl-tempo"><output id="tempo-out" for="tempo"></output></div>
+        </div>
+        <div class="row">
+          <span id="lbl-oct">音高</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-oct">
+            <label><input type="radio" name="oct" id="oct-low" value="-1">低</label>
+            <label><input type="radio" name="oct" id="oct-mid" value="0">中</label>
+            <label><input type="radio" name="oct" id="oct-high" value="1">高</label>
+          </div>
+        </div>
+        <div class="row">
+          <span id="lbl-tone">音色</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-tone">
+            <label><input type="radio" name="tone" id="tone-ocarina" value="ocarina">陶笛</label>
+            <label><input type="radio" name="tone" id="tone-pure" value="pure">純音</label>
+          </div>
+        </div>
+        <div class="row">
+          <span id="lbl-vol">音量</span>
+          <div class="range"><input type="range" id="vol" min="0" max="1" step="0.05" aria-labelledby="lbl-vol"><output id="vol-out" for="vol"></output></div>
+        </div>
+        <p class="set-note">遊戲辨識不到時，先試試換音高或改用純音。iPhone 沒有聲音的話，請關掉側邊的靜音開關。</p>
+      </div>
+    </details>
+  </header>
+
+  <main id="board" aria-label="歌曲"></main>
+
+  <footer>
+    <p>按鍵是 Switch 2 的預設配置，五個音由低到高是 L R A Y X。薩爾達的搖籃曲和時之歌有任天堂官方截圖可以對照，其他歌照原版旋律換算。網頁靠聲音讓遊戲辨識，跟按鍵配置無關。</p>
+    <p>長按 icon 約 0.3 秒可以拖曳排序。釘選、順序、設定和稻草人旋律都存在這個瀏覽器裡。</p>
+    <p>非官方玩家工具，與任天堂無關。</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ================= data ================= */
+const KEYS = ['L', 'R', 'A', 'Y', 'X'];          // low → high
+const MIDI = [74, 77, 81, 83, 86];                // D5 F5 A5 B5 D6
+const CATS = [
+  { id: 'mech',   name: '開啟機關' },
+  { id: 'sky',    name: '時間與天氣' },
+  { id: 'call',   name: '召喚與溝通' },
+  { id: 'warp',   name: '傳送' },
+  { id: 'mini',   name: '小遊戲' },
+  { id: 'custom', name: '自訂' },
+];
+const SONGS = [
+  { id: 'lullaby',  cat: 'mech', name: '薩爾達的搖籃曲', en: "Zelda's Lullaby",   icon: 'crown',     c: '#E89AC0', notes: [3,4,2,3,4,2], use: '證明與王族的關係，打開刻有王家紋章的機關', learn: '英帕・海拉魯城堡中庭' },
+  { id: 'time',     cat: 'mech', name: '時之歌',         en: 'Song of Time',      icon: 'hourglass', c: '#8FD3E8', notes: [2,0,1,2,0,1], use: '打開時之門，移動刻有時之紋的藍色石塊', learn: '薩爾達・城下町外的護城河' },
+  { id: 'sun',      cat: 'sky',  name: '太陽之歌',       en: "Sun's Song",        icon: 'sun',       c: '#F5B942', notes: [2,1,4,2,1,4], use: '白天和黑夜互換，定住殭屍類敵人', learn: '卡卡利科村墓地・王家之墓' },
+  { id: 'storms',   cat: 'sky',  name: '風暴之歌',       en: 'Song of Storms',    icon: 'storm',     c: '#A9B6D8', notes: [0,1,4,0,1,4], use: '招來大雨，打開隱藏洞穴', learn: '卡卡利科村風車小屋（長大後）' },
+  { id: 'epona',    cat: 'call', name: '艾波娜之歌',     en: "Epona's Song",      icon: 'horseshoe', c: '#D59A5B', notes: [4,3,2,4,3,2], use: '長大後呼叫愛馬，讓乳牛給牛奶', learn: '瑪蓉・隆隆牧場' },
+  { id: 'saria',    cat: 'call', name: '沙莉亞之歌',     en: "Saria's Song",      icon: 'fairy',     c: '#7FD8B0', notes: [1,2,3,1,2,3], use: '跟沙莉亞遠距通話聽提示，讓達爾尼亞跳舞', learn: '沙莉亞・聖森林草原' },
+  { id: 'minuet',   cat: 'warp', name: '森林小步舞曲',   en: 'Minuet of Forest',  icon: 'leaf',      c: '#5FC46E', notes: [0,4,3,2,3,2], use: '傳送到聖森林草原（森林神殿入口）', learn: '席克・聖森林草原' },
+  { id: 'bolero',   cat: 'warp', name: '火焰波麗露',     en: 'Bolero of Fire',    icon: 'flame',     c: '#FF6B45', notes: [1,0,1,0,2,1,2,1], use: '傳送到死亡山火山口', learn: '席克・死亡山火山口' },
+  { id: 'serenade', cat: 'warp', name: '水之小夜曲',     en: 'Serenade of Water', icon: 'drop',      c: '#4D9BFF', notes: [0,1,2,2,3], use: '傳送到海利亞湖', learn: '席克・冰之洞窟' },
+  { id: 'nocturne', cat: 'warp', name: '暗影夜曲',       en: 'Nocturne of Shadow',icon: 'moon',      c: '#B07CFF', notes: [3,2,2,0,3,2,1], use: '傳送到卡卡利科村墓地', learn: '席克・卡卡利科村' },
+  { id: 'requiem',  cat: 'warp', name: '魂之安魂曲',     en: 'Requiem of Spirit', icon: 'dune',      c: '#F08A3C', notes: [0,1,0,2,1,0], use: '傳送到沙漠巨像', learn: '席克・沙漠巨像' },
+  { id: 'prelude',  cat: 'warp', name: '光之前奏曲',     en: 'Prelude of Light',  icon: 'star',      c: '#FFE27A', notes: [4,2,4,2,3,4], use: '傳送到時之神殿', learn: '席克・時之神殿' },
+  { id: 'frogs',    cat: 'mini', name: '青蛙之歌',       en: "Zora's River Frogs", icon: 'frog',     c: '#9BD45A', notes: [0,3,2,1,3,2,1,0,1,0,1,2,3,0],
+    use: '在索拉河對 5 隻青蛙吹這段 14 個音，完成可以拿到心之碎片', learn: '索拉河的青蛙（小時候）',
+    tip: '這個小遊戲要跟著青蛙的提示一個音一個音吹，接不上的話把速度調慢' },
+  { id: 'scarecrow',cat: 'custom', name: '稻草人之歌',   en: "Scarecrow's Song",  icon: 'scarecrow', c: '#C9B37A', notes: null, custom: true,
+    use: '小時候在海利亞湖教稻草人一段 8 個音的旋律，長大後吹給它聽，它就會出現，可以當鉤爪的落點', learn: '海利亞湖的稻草人' },
+];
+const BY = Object.fromEntries(SONGS.map(s => [s.id, s]));
+
+/* ================= icons ================= */
+const CROWN = 'M4.2 17.5 3 8l5 4 4-6 4 6 5-4-1.2 9.5z';
+const MOON = 'M15 3.6A8.6 8.6 0 1 0 20.6 17 7 7 0 0 1 15 3.6z';
+const ICONS = {
+  crown: `<defs><clipPath id="cc{u}"><path d="${CROWN}"/></clipPath></defs><path class="fl" d="${CROWN}"/><g clip-path="url(#cc{u})"><path class="a-sheen" fill="#fff" d="M1 19 4.5 4h2.6L3.6 19z"/></g><path class="st" d="M4.5 20.5h15"/><circle class="solid a-gem" cx="12" cy="13.6" r="1.4"/><path class="a-gemspark" fill="#fff" d="M12 11.2l.45 1.95 1.95.45-1.95.45-.45 1.95-.45-1.95-1.95-.45 1.95-.45z"/>`,
+  hourglass: `<g class="a-flip"><path class="st" d="M6.5 3.2h11M6.5 20.8h11"/><path class="st" d="M8 3.2c0 4.6 4 5.6 4 8.8s-4 4.2-4 8.8h8c0-4.6-4-5.6-4-8.8s4-4.2 4-8.8z"/><path class="solid a-sand-top" opacity=".6" d="M8.7 5.4h6.6c-.7 2.4-2.4 3.7-3.3 5.3-.9-1.6-2.6-2.9-3.3-5.3z"/><path class="solid a-sand-bot" d="M9 20.8c.6-2.6 3-3.7 3-3.7s2.4 1.1 3 3.7z"/><g class="a-grains"><circle class="solid a-grain" cx="12" cy="12.6" r=".55"/><circle class="solid a-grain g2" cx="12" cy="12.6" r=".55"/></g></g>`,
+  sun: `<g class="a-spin"><g class="a-breathe"><path class="st" d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></g></g><circle class="fl" cx="12" cy="12" r="4"/>`,
+  storm: `<g class="a-drift"><path class="fl" d="M7 15.5a4 4 0 0 1-.3-8 5.2 5.2 0 0 1 10 1.3 3.4 3.4 0 0 1 .3 6.7z"/></g><path class="st a-bolt" d="M12.6 13.2 10.4 17.4h3.2l-2 4"/>`,
+  horseshoe: `<g class="a-gallop"><path class="st" style="stroke-width:3.4;stroke-linecap:butt" d="M6.5 3.8v6.7a5.5 5.5 0 0 0 11 0V3.8"/><circle class="hole" cx="6.5" cy="6.6" r=".75"/><circle class="hole" cx="17.5" cy="6.6" r=".75"/><circle class="hole" cx="7.2" cy="12.6" r=".75"/><circle class="hole" cx="16.8" cy="12.6" r=".75"/></g>`,
+  fairy: `<g class="a-hover"><g class="a-wing-l"><ellipse class="fl" style="stroke-width:1.3" cx="7.4" cy="9" rx="4.2" ry="2.5" transform="rotate(28 7.4 9)"/><ellipse class="fl" style="stroke-width:1.3" cx="8.4" cy="15.4" rx="2.9" ry="1.7" transform="rotate(-24 8.4 15.4)"/></g><g class="a-wing-r"><ellipse class="fl" style="stroke-width:1.3" cx="16.6" cy="9" rx="4.2" ry="2.5" transform="rotate(-28 16.6 9)"/><ellipse class="fl" style="stroke-width:1.3" cx="15.6" cy="15.4" rx="2.9" ry="1.7" transform="rotate(24 15.6 15.4)"/></g><circle class="solid" cx="12" cy="12" r="2.7"/></g>`,
+  leaf: `<g class="a-sway"><path class="fl" d="M5 19C5 10.5 10.5 5 19 5c0 8.5-5.5 14-14 14z"/><path class="st thin2" d="M5 19 14.5 9.5M9.5 14.5h3.6M11.8 12.2V8.8"/></g>`,
+  flame: `<g class="a-flicker"><path class="fl" d="M12 2.8c.8 3.6 5.2 5.6 5.2 10.7a5.2 5.2 0 0 1-10.4 0c0-2.7 1.6-4 2.2-5.8.9.9 1.5 2 1.6 3.1 1.3-2.2 1.9-4.8 1.4-8z"/></g><g class="a-flicker2"><path class="solid" d="M12 20.4c-1.5 0-2.5-1-2.5-2.4 0-1.6 1.4-2.4 2.5-4.1 1.1 1.7 2.5 2.5 2.5 4.1 0 1.4-1 2.4-2.5 2.4z"/></g><circle class="solid a-ember" cx="9.4" cy="5.4" r=".8"/><circle class="solid a-ember e2" cx="14.8" cy="4.6" r=".65"/><circle class="solid a-ember e3" cx="12" cy="1.6" r=".7"/>`,
+  drop: `<g class="a-bob"><path class="fl" d="M12 3c3.2 4.6 6 7.8 6 11.5a6 6 0 0 1-12 0C6 10.8 8.8 7.6 12 3z"/><g class="a-wave"><path class="st thin2" d="M8.8 15.4c1.1-.9 2.1-.9 3.2 0s2.1.9 3.2 0"/></g></g>`,
+  moon: `<path class="solid a-moonglow" d="${MOON}"/><path class="fl" d="${MOON}"/><path class="solid a-twinkle" d="M18.2 5.2l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z"/><circle class="solid a-twinkle t2" cx="21" cy="11.4" r=".65"/>`,
+  dune: `<path class="fl" d="M2.5 19.8c2.4-5 7.4-6 11-2.6 2-2 5.6-2.5 8 2.6z"/><g class="a-wind"><path class="st thin2" d="M4 9.6h8.6a2.1 2.1 0 1 0-2.1-2.1"/></g><g class="a-wind w2"><path class="st thin2" d="M6.5 13h10.2a2.1 2.1 0 1 1-2.1 2.1"/></g>`,
+  star: `<g class="a-spinslow"><path class="fl" d="M11 3l1.9 7 7 1.9-7 1.9-1.9 7-1.9-7-7-1.9 7-1.9z"/></g><path class="solid a-twinkle" d="M19 1.8l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6z"/><g class="a-rays"><path class="st thin" d="M11 .8v1.6M11 21.6v1.6M-.2 12h1.6M20.6 12h1.6"/></g>`,
+  frog: `<g class="a-hop"><path class="fl" d="M4 16.4c0-4 3.6-6.4 8-6.4s8 2.4 8 6.4c0 2.4-3.6 3.8-8 3.8s-8-1.4-8-3.8z"/><circle class="fl" cx="8" cy="9.2" r="2.6"/><circle class="fl" cx="16" cy="9.2" r="2.6"/><circle class="solid" cx="8" cy="9.2" r="1"/><circle class="solid" cx="16" cy="9.2" r="1"/><path class="st thin2" d="M9 15.8c1.8 1.2 4.2 1.2 6 0"/></g><g class="a-croak"><ellipse class="fl" cx="12" cy="20.6" rx="2.4" ry="1.3"/></g>`,
+  scarecrow: `<g class="a-sway2"><path class="st" d="M12 9.6v12M4.2 12.6h15.6"/><path class="st thin" d="M4.2 12.6l-1.1 2.1M19.8 12.6l1.1 2.1M12 21.6l-1.4 1M12 21.6l1.4 1"/><circle class="fl" style="stroke-width:1.5" cx="12" cy="7.2" r="2.5"/><g class="a-hat"><path class="st" style="stroke-width:1.5" d="M7.4 4.7h9.2M9.6 4.7 12 1.8l2.4 2.9"/></g></g>`,
+};
+const SWORD = '<svg viewBox="0 0 16 34" aria-hidden="true"><ellipse class="slit" cx="8" cy="31" rx="3.4" ry="1.2"/><path class="blade" d="M6.5 14.4h3V31h-3z"/><path class="fuller" d="M8 15.2v15"/><path class="guard" d="M1.6 12.4c2 .9 4.2 1.3 6.4 1.3s4.4-.4 6.4-1.3v2.1c-2 .7-4.2 1-6.4 1s-4.4-.3-6.4-1z"/><rect class="grip" x="6.9" y="5.2" width="2.2" height="7.4" rx=".6"/><circle class="pommel" cx="8" cy="3.6" r="2"/></svg>';
+const TRI = '<svg viewBox="0 0 24 21" aria-hidden="true"><path d="M12 1.2 17.4 10.5H6.6zM6.6 10.5 12 19.8H1.2zM17.4 10.5 22.8 19.8H12z"/></svg>';
+const SPARK = '<svg class="spark" viewBox="0 0 24 24"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg>';
+const I_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.4v11.2L13.6 8z"/></svg>';
+const I_STOP = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg>';
+let uid = 0;
+
+/* ================= state ================= */
+const STORE = 'ocarina-stand:v1';
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+function load() {
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) { s = {}; }
+  const pinned = [...new Set((Array.isArray(s.pinned) ? s.pinned : []).filter(id => BY[id]))];
+  const order = {};
+  CATS.forEach(c => {
+    const ids = SONGS.filter(x => x.cat === c.id).map(x => x.id);
+    const saved = s.order && Array.isArray(s.order[c.id]) ? s.order[c.id].filter(id => ids.includes(id)) : [];
+    order[c.id] = [...new Set([...saved, ...ids])];
+  });
+  const scare = Array.isArray(s.scare) && s.scare.length === 8 && s.scare.every(n => Number.isInteger(n) && n >= 0 && n < 5) ? s.scare : [];
+  return {
+    pinned, order, scare,
+    tempo: clamp(Number(s.tempo) || 0.42, 0.25, 0.8),
+    oct: [-1, 0, 1].includes(s.oct) ? s.oct : 0,
+    tone: s.tone === 'pure' ? 'pure' : 'ocarina',
+    vol: Number.isFinite(Number(s.vol)) && s.vol !== null ? clamp(Number(s.vol), 0, 1) : 0.8,
+  };
+}
+const state = load();
+function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* private mode: keep working without memory */ } }
+
+let openId = null;        // song whose score panel is open
+let editing = false;      // scarecrow composer open
+let draft = [];
+let justDragged = false;
+let sortables = [];
+
+/* ================= helpers ================= */
+const $ = (sel, root = document) => root.querySelector(sel);
+const tilesOf = id => document.querySelectorAll(`.tile[data-id="${id}"]`);
+const notesOf = s => (s.custom ? state.scare : s.notes);
+const hasMelody = s => !s.custom || state.scare.length === 8;
+const glyph = (n, extra = '') => `<span class="g${n < 2 ? ' sh' : ''}${extra}" style="--p:${n}">${KEYS[n]}</span>`;
+let toastTimer = 0;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+function medal(s) {
+  const u = 'u' + (++uid);
+  return `<span class="mw" aria-hidden="true"><span class="halo"></span>` +
+    `<svg class="ring" viewBox="0 0 100 100"><circle class="ring-track" cx="50" cy="50" r="46"/><circle class="ring-prog" cx="50" cy="50" r="46" pathLength="100"/></svg>` +
+    `<span class="medal"><svg class="ico" viewBox="0 0 24 24">${ICONS[s.icon].replaceAll('{u}', u)}</svg></span>` +
+    `<span class="ripples"></span>${SPARK}</span>`;
+}
+
+/* ================= render ================= */
+const board = $('#board');
+function tileHTML(s) {
+  const pinned = state.pinned.includes(s.id);
+  const need = !hasMelody(s);
+  return `<div class="tile" data-id="${s.id}" style="--c:${s.c}">` +
+    `<button type="button" class="sword" aria-pressed="${pinned}" aria-label="${pinned ? '取消釘選' : '釘選'}${s.name}">${SWORD}</button>` +
+    `<button type="button" class="tile-play" aria-label="${need ? '編寫' : '播放'}${s.name}">${medal(s)}<span class="tname">${s.name}</span>${need ? '<span class="badge">未編曲</span>' : ''}</button>` +
+    `<button type="button" class="tri" aria-expanded="false" aria-label="展開${s.name}的樂譜">${TRI}</button></div>`;
+}
+function sectionHTML(id, name, ids, total) {
+  const empty = id === 'pinned' ? '點卡片右上角的劍，常用的歌會釘在這裡。' : '這一類都釘選到上方了。';
+  return `<section class="cat" aria-label="${name}"><h2>${name}<span class="count">${total} 首</span></h2>` +
+    `<div class="grid" data-list="${id}">${ids.map(i => tileHTML(BY[i])).join('')}</div>` +
+    (ids.length ? '' : `<p class="empty">${empty}</p>`) + `</section>`;
+}
+function render() {
+  sortables.forEach(s => s.destroy()); sortables = [];
+  let html = sectionHTML('pinned', '釘選', state.pinned, state.pinned.length);
+  CATS.forEach(c => {
+    const ids = state.order[c.id].filter(id => !state.pinned.includes(id));
+    html += sectionHTML(c.id, c.name, ids, state.order[c.id].length);
+  });
+  board.innerHTML = html;
+  if (window.Sortable) board.querySelectorAll('.grid').forEach(g => sortables.push(makeSortable(g)));
+  if (player) { markPlaying(player.id, true); setProgress(player.id, progressNow()); }
+  placePanel();
+}
+
+/* ================= score panel ================= */
+function playBtnHTML(s) {
+  const n = notesOf(s).length;
+  const on = player && player.id === s.id;
+  return on ? `${I_STOP}<span>停止</span><small>${Math.min(player.k + 1, n)} / ${n}</small>`
+            : `${I_PLAY}<span>播放</span><small>${n} 個音</small>`;
+}
+function infoHTML(s) {
+  return `<dl class="p-info"><div><dt>用途</dt><dd>${s.use}</dd></div><div><dt>在哪學</dt><dd>${s.learn}</dd></div>` +
+    (s.tip ? `<div><dt>提醒</dt><dd>${s.tip}</dd></div>` : '') + `</dl>`;
+}
+function staffHTML(notes) {
+  const rows = notes.length > 8 ? Math.ceil(notes.length / 7) : 1, per = Math.ceil(notes.length / rows);
+  let out = '';
+  for (let r = 0; r < rows; r++) out += `<div class="staff" style="--n:${per}">${notes.slice(r * per, (r + 1) * per).map(n => glyph(n)).join('')}</div>`;
+  return `<div class="staves">${out}</div>`;
+}
+function scareProblem(d) {
+  if (d.length < 8) return '';
+  if (d.every(n => n === d[0])) return '8 個音不能全部一樣，請換幾個音。';
+  const str = d.join(',') + ',';
+  const hit = SONGS.find(x => x.notes && x.cat !== 'mini' && (',' + str).includes(',' + x.notes.join(',') + ','));
+  return hit ? `裡面包含「${hit.name}」的旋律，遊戲會直接當成那首歌，請改掉幾個音。` : '';
+}
+function panelHTML(s) {
+  const head = `<div class="p-head"><b>${s.name}</b><span class="en">${s.en}</span></div>`;
+  if (s.custom && (editing || !hasMelody(s))) {
+    const d = draft, prob = scareProblem(d);
+    const slots = Array.from({ length: 8 }, (_, i) => i < d.length ? glyph(d[i]) : '<span class="g empty" style="--p:2"></span>').join('');
+    const keys = KEYS.map((k, i) => `<button type="button" class="key${i < 2 ? ' sh' : ''}" data-action="key" data-key="${i}"${d.length >= 8 ? ' disabled' : ''} aria-label="加入 ${k}">${k}</button>`).join('');
+    return head +
+      `<p class="c-intro">輸入你在遊戲裡教稻草人的 8 個音，或先在這裡編好，再播給它聽。每點一個鍵會播出那個音。規則：8 個音不能全部一樣，也不能包含其他歌曲的旋律。</p>` +
+      `<div class="staff" style="--n:8">${slots}</div>` +
+      `<div class="c-status"><span>已輸入 <b>${d.length}</b> / 8</span><code>${d.length ? d.map(n => KEYS[n]).join(' ') : '還沒輸入'}</code></div>` +
+      (prob ? `<p class="c-warn" role="alert">${prob}</p>` : '') +
+      `<div class="keys">${keys}</div>` +
+      `<div class="c-actions"><button type="button" class="btn" data-action="undo"${d.length ? '' : ' disabled'}>刪除上一個</button>` +
+      `<button type="button" class="btn" data-action="clear"${d.length ? '' : ' disabled'}>清除</button>` +
+      (hasMelody(s) ? '<button type="button" class="btn" data-action="cancel">取消</button>' : '') +
+      `<button type="button" class="btn primary" data-action="save"${d.length === 8 && !prob ? '' : ' disabled'}>儲存</button></div>`;
+  }
+  const notes = notesOf(s);
+  const staff = staffHTML(notes);
+  const backup = s.custom ? `<div class="c-status"><span>你的旋律</span><code>${notes.map(n => KEYS[n]).join(' ')}</code></div>` : '';
+  const actions = s.custom
+    ? `<div class="p-actions"><button type="button" class="btn" data-action="edit">重新編曲</button><button type="button" class="playbtn" data-action="play">${playBtnHTML(s)}</button></div>`
+    : `<button type="button" class="playbtn" data-action="play">${playBtnHTML(s)}</button>`;
+  return head + staff + backup + infoHTML(s) + actions;
+}
+function placePanel(focusKey) {
+  const old = $('#panel'); if (old) old.remove();
+  board.querySelectorAll('.tile.open').forEach(t => {
+    t.classList.remove('open');
+    const b = $('.tri', t); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', `展開${BY[t.dataset.id].name}的樂譜`);
+  });
+  if (!openId) return;
+  const tile = $(`.tile[data-id="${openId}"]`, board); if (!tile) { openId = null; return; }
+  const s = BY[openId];
+  const grid = tile.parentElement;
+  const tiles = [...grid.querySelectorAll('.tile')];
+  const i = tiles.indexOf(tile);
+  const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 3;
+  const end = Math.min(tiles.length - 1, Math.floor(i / cols) * cols + cols - 1);
+  const panel = document.createElement('div');
+  panel.className = 'panel'; panel.id = 'panel'; panel.dataset.id = s.id;
+  panel.setAttribute('role', 'region'); panel.setAttribute('aria-label', `${s.name}的樂譜`);
+  panel.style.setProperty('--c', s.c);
+  panel.innerHTML = panelHTML(s);
+  tiles[end].after(panel);
+  const gr = grid.getBoundingClientRect(), tr = tile.getBoundingClientRect();
+  panel.style.setProperty('--nx', (tr.left - gr.left + tr.width / 2) + 'px');
+  tile.classList.add('open');
+  const b = $('.tri', tile); b.setAttribute('aria-expanded', 'true'); b.setAttribute('aria-label', `收起${s.name}的樂譜`); b.setAttribute('aria-controls', 'panel');
+  if (player && player.id === s.id) highlightStaff(player.k);
+  if (focusKey != null) { const k = $(`.key[data-key="${focusKey}"]`, panel) || $('[data-action="save"]:not(:disabled)', panel); if (k) k.focus(); }
+}
+function toggleOpen(id) {
+  if (openId === id) { openId = null; editing = false; }
+  else { openId = id; editing = false; draft = []; }
+  placePanel();
+}
+function highlightStaff(k) {
+  const p = $('#panel'); if (!p || !player || p.dataset.id !== player.id || $('.keys', p)) return;
+  p.querySelectorAll('.staff .g').forEach((g, i) => { g.classList.toggle('on', i === k); g.classList.toggle('done', i < k); });
+  const btn = $('.playbtn', p); if (btn) btn.innerHTML = playBtnHTML(BY[player.id]);
+}
+function resetPanel(id) {
+  const p = $('#panel'); if (!p || p.dataset.id !== id) return;
+  p.querySelectorAll('.staff .g').forEach(g => g.classList.remove('on', 'done'));
+  const btn = $('.playbtn', p); if (btn) { btn.innerHTML = playBtnHTML(BY[id]); btn.style.setProperty('--prog', '0%'); }
+}
+
+/* ================= audio ================= */
+let ctx = null, master = null, noiseBuf = null, player = null, raf = 0;
+function audio() {
+  if (!ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { toast('這個瀏覽器不支援網頁音訊，請換 Safari 或 Chrome'); return null; }
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* not supported */ }
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = state.vol;
+    const comp = ctx.createDynamicsCompressor();
+    master.connect(comp); comp.connect(ctx.destination);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  return ctx;
+}
+function whenReady(fn) {
+  const c = audio(); if (!c) return;
+  if (c.state === 'running') fn(); else c.resume().then(fn).catch(() => toast('聲音被瀏覽器擋住了，請再點一次'));
+}
+function voice(bus, n, t, dur) {
+  const f = 440 * Math.pow(2, (MIDI[n] + 12 * state.oct - 69) / 12);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.42, t + 0.025);
+  g.gain.setValueAtTime(0.42, t + dur - 0.05);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  g.connect(bus);
+  const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.connect(g);
+  const src = [o];
+  if (state.tone === 'ocarina') {
+    const o2 = ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = f * 2;
+    const g2 = ctx.createGain(); g2.gain.value = 0.05; o2.connect(g2); g2.connect(g);
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 5.2;
+    const lg = ctx.createGain(); lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * 0.006, t + Math.min(0.3, dur * 0.7));
+    lfo.connect(lg); lg.connect(o.frequency);
+    const nz = ctx.createBufferSource(); nz.buffer = noiseBuf;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f * 1.5; bp.Q.value = 1.2;
+    const ng = ctx.createGain();
+    ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(0.06, t + 0.012);
+    ng.gain.exponentialRampToValueAtTime(0.008, t + 0.1); ng.gain.linearRampToValueAtTime(0, t + dur);
+    nz.connect(bp); bp.connect(ng); ng.connect(bus);
+    src.push(o2, lfo, nz);
+  }
+  src.forEach(s => { s.start(t); s.stop(t + dur + 0.05); });
+}
+function progressNow() { return player ? clamp((ctx.currentTime - player.t0) / player.total, 0, 1) : 0; }
+function setProgress(id, p) {
+  tilesOf(id).forEach(t => { const r = $('.ring-prog', t); if (r) r.style.strokeDashoffset = String(100 - 100 * p); });
+  const btn = $(`#panel[data-id="${id}"] .playbtn`); if (btn) btn.style.setProperty('--prog', (p * 100) + '%');
+}
+function tick() { if (!player) return; setProgress(player.id, progressNow()); raf = requestAnimationFrame(tick); }
+function markPlaying(id, on) {
+  tilesOf(id).forEach(t => {
+    t.classList.toggle('playing', on);
+    $('.tile-play', t).setAttribute('aria-label', `${on ? '停止' : '播放'}${BY[id].name}`);
+  });
+}
+function pulse(id) {
+  tilesOf(id).forEach(t => {
+    const mw = $('.mw', t); if (!mw) return;
+    const r = document.createElement('span'); r.className = 'rip';
+    $('.ripples', mw).appendChild(r); setTimeout(() => r.remove(), 900);
+    const m = $('.medal', mw); m.classList.remove('bump'); void m.offsetWidth; m.classList.add('bump');
+  });
+}
+function play(id) {
+  const s = BY[id];
+  if (!hasMelody(s)) { stop(); openId = id; editing = true; draft = []; placePanel(); return; }
+  whenReady(() => {
+    stop();
+    const notes = notesOf(s);
+    const step = state.tempo, dur = step * 0.86, t0 = ctx.currentTime + 0.06;
+    const bus = ctx.createGain(); bus.connect(master);
+    notes.forEach((n, k) => voice(bus, n, t0 + k * step, dur));
+    const at = sec => Math.max(0, (sec - ctx.currentTime) * 1000);
+    player = { id, t0, total: notes.length * step, k: 0, bus, timers: [] };
+    notes.forEach((n, k) => player.timers.push(setTimeout(() => { if (!player || player.id !== id) return; player.k = k; pulse(id); highlightStaff(k); }, at(t0 + k * step))));
+    player.timers.push(setTimeout(() => finish(id), at(t0 + notes.length * step) + 40));
+    markPlaying(id, true); highlightStaff(-1);
+    cancelAnimationFrame(raf); tick();
+  });
+}
+function stop() {
+  if (!player) return;
+  const p = player; player = null;
+  p.timers.forEach(clearTimeout);
+  try {
+    const now = ctx.currentTime;
+    p.bus.gain.cancelScheduledValues(now); p.bus.gain.setValueAtTime(p.bus.gain.value, now);
+    p.bus.gain.linearRampToValueAtTime(0, now + 0.04);
+    setTimeout(() => p.bus.disconnect(), 150);
+  } catch (e) { /* already gone */ }
+  markPlaying(p.id, false); setProgress(p.id, 0); resetPanel(p.id);
+}
+function finish(id) {
+  if (!player || player.id !== id) return;
+  const p = player; player = null;
+  setProgress(id, 1); markPlaying(id, false); resetPanel(id);
+  tilesOf(id).forEach(t => t.classList.add('finish'));
+  setTimeout(() => {
+    tilesOf(id).forEach(t => t.classList.remove('finish'));
+    if (!player || player.id !== id) setProgress(id, 0);
+  }, 800);
+  setTimeout(() => { try { p.bus.disconnect(); } catch (e) { /* ignore */ } }, 300);
+}
+function previewNote(n) {
+  whenReady(() => { const bus = ctx.createGain(); bus.connect(master); voice(bus, n, ctx.currentTime + 0.01, 0.34); setTimeout(() => bus.disconnect(), 600); });
+}
+
+/* ================= pin & order ================= */
+function togglePin(id) {
+  const s = BY[id];
+  const i = state.pinned.indexOf(id);
+  if (i >= 0) state.pinned.splice(i, 1); else state.pinned.push(id);
+  save(); render();
+  if (i < 0) {
+    tilesOf(id).forEach(t => { t.classList.add('just-pinned'); setTimeout(() => t.classList.remove('just-pinned'), 500); });
+    toast(`已釘選「${s.name}」到最上面`);
+  } else toast(`已取消釘選「${s.name}」`);
+}
+function saveOrder(grid) {
+  const list = grid.dataset.list;
+  const ids = [...grid.querySelectorAll('.tile')].map(t => t.dataset.id);
+  if (list === 'pinned') state.pinned = ids;
+  else { let k = 0; state.order[list] = state.order[list].map(id => state.pinned.includes(id) ? id : ids[k++]); }
+  save();
+}
+function makeSortable(grid) {
+  return new Sortable(grid, {
+    draggable: '.tile', filter: '.sword, .tri', preventOnFilter: false,
+    delay: 300, delayOnTouchOnly: true, touchStartThreshold: 6,
+    forceFallback: true, fallbackTolerance: 4, animation: 160,
+    ghostClass: 'drag-ghost', chosenClass: 'drag-chosen',
+    onStart() { justDragged = true; if (openId) { openId = null; editing = false; placePanel(); } },
+    onEnd() { saveOrder(grid); setTimeout(() => { justDragged = false; }, 80); },
+  });
+}
+
+/* ================= events ================= */
+board.addEventListener('click', e => {
+  if (justDragged) return;
+  const act = e.target.closest('[data-action]');
+  if (act) return onAction(act);
+  const tile = e.target.closest('.tile'); if (!tile) return;
+  const id = tile.dataset.id;
+  if (e.target.closest('.sword')) return togglePin(id);
+  if (e.target.closest('.tri')) return toggleOpen(id);
+  if (e.target.closest('.tile-play')) { if (player && player.id === id) stop(); else play(id); }
+});
+function onAction(btn) {
+  const a = btn.dataset.action, s = BY[openId]; if (!s) return;
+  if (a === 'play') { if (player && player.id === s.id) stop(); else play(s.id); return; }
+  if (a === 'edit') { editing = true; draft = []; placePanel(); return; }
+  if (a === 'cancel') { editing = false; draft = []; placePanel(); return; }
+  if (a === 'key') { const n = Number(btn.dataset.key); if (draft.length < 8) { draft.push(n); previewNote(n); } placePanel(n); return; }
+  if (a === 'undo') { draft.pop(); placePanel(); return; }
+  if (a === 'clear') { draft = []; placePanel(); return; }
+  if (a === 'save' && draft.length === 8 && !scareProblem(draft)) {
+    state.scare = draft.slice(); draft = []; editing = false; save(); render();
+    toast('已儲存稻草人之歌'); return;
+  }
+}
+board.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && openId) {
+    const id = openId; openId = null; editing = false; placePanel();
+    const t = $(`.tile[data-id="${id}"] .tri`); if (t) t.focus(); return;
+  }
+  if (!e.altKey) return;
+  const dir = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key]; if (!dir) return;
+  const tile = e.target.closest('.tile'); if (!tile) return;
+  e.preventDefault();
+  const grid = tile.parentElement, tiles = [...grid.querySelectorAll('.tile')], j = tiles.indexOf(tile) + dir;
+  if (j < 0 || j >= tiles.length) return;
+  if (openId) { openId = null; editing = false; placePanel(); }
+  if (dir < 0) tiles[j].before(tile); else tiles[j].after(tile);
+  saveOrder(grid); $('.tile-play', tile).focus();
+});
+let rz = 0;
+window.addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => { if (openId) placePanel(); }); });
+
+/* ================= settings ================= */
+const OCT = { '-1': '低', '0': '中', '1': '高' };
+function syncSettings() {
+  $('#tempo').value = state.tempo; $('#tempo-out').textContent = state.tempo.toFixed(2) + ' 秒';
+  $('#vol').value = state.vol; $('#vol-out').textContent = Math.round(state.vol * 100) + '%';
+  $(`input[name="oct"][value="${state.oct}"]`).checked = true;
+  $(`input[name="tone"][value="${state.tone}"]`).checked = true;
+  $('#set-sum').textContent = `每音 ${state.tempo.toFixed(2)} 秒・音高${OCT[state.oct]}・${state.tone === 'ocarina' ? '陶笛' : '純音'}`;
+}
+$('#tempo').addEventListener('input', e => { state.tempo = clamp(Number(e.target.value), 0.25, 0.8); syncSettings(); save(); });
+$('#vol').addEventListener('input', e => { state.vol = clamp(Number(e.target.value), 0, 1); if (master) master.gain.value = state.vol; syncSettings(); save(); });
+document.querySelectorAll('input[name="oct"]').forEach(r => r.addEventListener('change', () => { state.oct = Number(r.value); syncSettings(); save(); }));
+document.querySelectorAll('input[name="tone"]').forEach(r => r.addEventListener('change', () => { state.tone = r.value; syncSettings(); save(); }));
+
+syncSettings();
+render();
+})();
+</script>
+</body>
+</html>
